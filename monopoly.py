@@ -18,7 +18,7 @@ gameboard = ""
 board = None
 history = []
 status = []
-CASH = 2000
+CASH = -100
 num_players = 4
 bankrupts = 0
 players = []
@@ -717,24 +717,30 @@ def player_choice():
             print("\033[36;0H" + ' ' * 70)
             choice = input("\033[36;0He to end turn, p to manage properties, d to view a deed?")
         update_history(f"{players[turn].name} ended their turn.")
+
     else:
         update_history(f"{players[turn]} is in debt. Resolve debts before ending turn.")
-        option = input("\033[38;0HResolve debts before ending turn.").lower().strip()
-        if(option == "b"): # Declare bankruptcy
-            update_history(f"{players[turn]} declared bankruptcy.")
-            players[turn].order = -1
-        elif(option == "m"): # Mortgage properties
-            mortgage_logic()
-        elif(option == "s"): # Sell houses/hotels
-            housing_logic()
 
-        # TODO! For now, just declare bankruptcy. Player should NOT, by default, be able to by pressing "enter"
+        while True:
+            option = input("\033[38;0Hm to mortgage properties, s to sell houses, b to declare bankruptcy.").lower().strip()
 
-        else:
-            update_history(f"{players[turn].name} declared bankruptcy.")
-            players[turn].order = -1
-        # Need to fix all this sometime erghhghh
-        bankrupts += 1
+            if(option == "b"): # Declare bankruptcy
+                update_history(f"{players[turn]} declared bankruptcy.")
+                players[turn].order = -1
+                bankrupts += 1
+                break
+
+            elif(option == "m"): # Mortgage properties
+                mortgage_logic(players[turn])
+                break
+
+            elif(option == "s"): # Sell houses/hotels
+                housing_logic(players[turn])
+                break
+
+            else:
+                add_to_output("Invalid option! Please enter 'm' to mortgage or 's' to sell houses.")
+                bottom_screen_wipe()
 
     # Wipe the bottom of the screen (input area)
     bottom_screen_wipe()
